@@ -1,0 +1,19 @@
+# docker-compose.yml
+services:
+  postgres:
+    image: postgres:latest
+    ports:
+      - "5432:5432"  # ← This exposes PostgreSQL to your host machine!
+    environment:
+      POSTGRES_PASSWORD: pollerbear
+      POSTGRES_USER: postgres
+      POSTGRES_DB: pokedex
+
+  pokedex:
+    build: .
+    ports:
+        - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/pokedex
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: pollerbear
