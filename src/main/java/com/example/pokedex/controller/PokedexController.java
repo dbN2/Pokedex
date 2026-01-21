@@ -10,14 +10,15 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
+@RequestMapping("/pokedex/")
 public class PokedexController {
     private final PokedexService service;
 
@@ -27,7 +28,6 @@ public class PokedexController {
 
     @GetMapping("/pokemon/{id}")
     public ResponseEntity<Response> getPokemon(@PathVariable Long id) {
-        Response response;
         if (id == null) {
             return createBadRequestResponse();
         }

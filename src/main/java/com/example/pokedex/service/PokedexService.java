@@ -24,7 +24,7 @@ public class PokedexService {
 
     public Optional<Pokemon> findPokemonById(Long id) {
         try {
-            return Optional.of(pokemonRepository.findById(id));
+            return Optional.ofNullable(pokemonRepository.findById(id));
         }
         catch (DataAccessException e) {
             log.error("Encountered database exception %s", e);
