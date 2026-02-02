@@ -6,14 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PokemonDto {
-    private final long id;
-    private final int pokedexNumber;
-    private final int hp;
-    private final int atk;
-    private final int def;
-    private final int spd;
-    private final int spatk;
-    private final int spdef;
+    private final Long id;
+    private final Integer pokedexNumber;
+    private final Integer hp;
+    private final Integer atk;
+    private final Integer def;
+    private final Integer spd;
+    private final Integer spatk;
+    private final Integer spdef;
     private final List<PokemonType> types;
     private final String evolvesFrom;
 
@@ -60,5 +60,41 @@ public class PokemonDto {
         public PokemonDto build() {
             return new PokemonDto(this);
         }
+    }
+
+    public Integer getPokedexNumber() {
+        return pokedexNumber;
+    }
+
+    public Integer getHp() {
+        return hp;
+    }
+
+    public Integer getAtk() {
+        return atk;
+    }
+
+    public Integer getDef() {
+        return def;
+    }
+
+    public Integer getSpd() {
+        return spd;
+    }
+
+    public Integer getSpatk() {
+        return spatk;
+    }
+
+    public Integer getSpdef() {
+        return spdef;
+    }
+
+    public List<PokemonType> getTypes() {
+        return types;
+    }
+
+    public String getEvolvesFrom() {
+        return evolvesFrom;
     }
 }

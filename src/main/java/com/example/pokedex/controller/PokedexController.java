@@ -8,17 +8,14 @@ import com.example.pokedex.model.dto.Response;
 import com.example.pokedex.service.PokedexService;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/pokedex/")
+@RequestMapping("/pokedex")
 public class PokedexController {
     private final PokedexService service;
 
@@ -26,18 +23,22 @@ public class PokedexController {
         this.service = service;
     }
 
+    @GetMapping
+    public String home() {
+        return "Hello, Docker!";
+    }
+
     @GetMapping("/pokemon/{id}")
     public ResponseEntity<Response> getPokemon(@PathVariable Long id) {
         if (id == null) {
             return createBadRequestResponse();
         }
-
         try {
             List<PokemonDto> pokemonResponse = mapToDto(service.findPokemonById(id));
             if (pokemonResponse.isEmpty()) {
                 return createNotFoundResponse();
             }
-            return createOkResponse(pokemonResponse);
+            return createOkResponse(pokemonResponse, 200);
         } catch (UnknownErrorException e) {
             return createUnknownErrorResponse();
         }
@@ -50,28 +51,33 @@ public class PokedexController {
             if (pokemonResponse.isEmpty()) {
                 return createNotFoundResponse();
             }
-            return createOkResponse(pokemonResponse);
+            return createOkResponse(pokemonResponse, 200);
         } catch (UnknownErrorException e) {
             return createUnknownErrorResponse();
         }
     }
 
     @GetMapping("/pokemon/type/{type}")
-    public ResponseEntity<Response> getAllPokemon(String type) {
+    public ResponseEntity<Response> getPokemonByType(String type) {
         if (!PokemonType.containsType(type)) {
             return createBadRequestResponse();
         }
-
         try {
-            //TODO findByType
-            List<PokemonDto> pokemonResponse = mapToDto(service.findAllPokemon());
+            PokemonType.Type pokemonType = PokemonType.getEnumFromString(type);
+            List<PokemonDto> pokemonResponse = mapToDto(service.findPokemonByType(pokemonType));
             if (pokemonResponse.isEmpty()) {
                 return createNotFoundResponse();
             }
-            return createOkResponse(pokemonResponse);
+            return createOkResponse(pokemonResponse, 200);
         } catch (UnknownErrorException e) {
             return createUnknownErrorResponse();
         }
+    }
+
+    @PostMapping("/pokemon")
+    public ResponseEntity<Response> createPokemon(@RequestBody PokemonDto request) {
+        List<PokemonDto> pokemonResponse = mapToDto(service.findPokemonById(1L));
+        return createOkResponse(pokemonResponse, 201);
     }
 
     private List<PokemonDto> mapToDto(Optional<Pokemon> pokemonOptional) {
@@ -132,7 +138,7 @@ public class PokedexController {
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(500));
     }
 
-    private ResponseEntity<Response> createOkResponse(List<PokemonDto> pokemon) {
+    private ResponseEntity<Response> createOkResponse(List<PokemonDto> pokemon, Integer httpCode) {
         Response response = new Response("", pokemon);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
     }

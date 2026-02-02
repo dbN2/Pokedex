@@ -2,6 +2,8 @@ package com.example.pokedex.service;
 
 import com.example.pokedex.exception.UnknownErrorException;
 import com.example.pokedex.model.Pokemon;
+import com.example.pokedex.model.PokemonType;
+import com.example.pokedex.model.dto.PokemonDto;
 import com.example.pokedex.repository.PokemonRepository;
 import com.example.pokedex.repository.PokemonTypeRepository;
 import org.slf4j.Logger;
@@ -27,12 +29,12 @@ public class PokedexService {
             return Optional.ofNullable(pokemonRepository.findById(id));
         }
         catch (DataAccessException e) {
-            log.error("Encountered database exception %s", e);
-            throw new UnknownErrorException("Encountered unexpected exception when getting pokemon by id");
+            log.error("Encountered database error %s", e);
+            throw new UnknownErrorException();
         }
         catch (RuntimeException e) {
-            log.error("Encountered unexpected exception when getting pokemon by id %s", e);
-            throw new UnknownErrorException("Encountered unexpected exception when getting pokemon by id");
+            log.error("Encountered unexpected error when getting pokemon by id %s", e);
+            throw new UnknownErrorException();
         }
     }
 
@@ -41,14 +43,38 @@ public class PokedexService {
             return pokemonRepository.findAll();
         }
         catch (DataAccessException e) {
-            log.error("Encountered database exception when getting pokemon %s", e);
-            throw e;
+            log.error("Encountered database error when getting all pokemon %s", e);
+            throw new UnknownErrorException();
         }
         catch (RuntimeException e) {
-            log.error("Encountered unexpected exception when getting pokemon %s", e);
-            throw e;
+            log.error("Encountered unexpected error when getting all pokemon %s", e);
+            throw new UnknownErrorException();
         }
     }
 
+    public List<Pokemon> findPokemonByType(PokemonType.Type type) {
+        try {
+            return pokemonRepository.findByType(type);
+        }
+        catch (DataAccessException e) {
+            log.error("Encountered database error when getting pokemon by type, %s", e);
+            throw new UnknownErrorException();
+        }
+        catch (RuntimeException e) {
+            log.error("Encountered unexpected error when getting pokemon by type, %s", e);
+            throw new UnknownErrorException();
+        }
+    }
 
+    public Optional<Pokemon> createPokemon(PokemonDto pokemonDto) {
+        try {
+            return Optional.ofNullable(pokemonRepository.createPokemon(pokemonDto));
+        } catch (DataAccessException e) {
+            log.error("Encountered database error when creating pokemon, %s", e);
+            throw new UnknownErrorException();
+        } catch (RuntimeException e) {
+            log.error("Encountered unexpected error when creating pokemon, %s", e);
+            throw new UnknownErrorException();
+        }
+    }
 }

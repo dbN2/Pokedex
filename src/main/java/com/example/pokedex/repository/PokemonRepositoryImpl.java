@@ -3,6 +3,7 @@ package com.example.pokedex.repository;
 import com.example.pokedex.mapper.PokemonRowMapper;
 import com.example.pokedex.model.Pokemon;
 import com.example.pokedex.model.PokemonType;
+import com.example.pokedex.model.dto.PokemonDto;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -32,8 +33,8 @@ public class PokemonRepositoryImpl implements PokemonRepository {
                               evo.name as evolves_from
                           FROM pokemon p
                           LEFT JOIN pokemon_types pt ON p.id = pt.pokemon_id
-                          LEFT JOIN types t ON pt.type_id = t.id
                           LEFT JOIN pokemon evo ON p.evolves_from_id = evo.id
+                          LEFT JOIN types t ON pt.type_id = t.id
                           GROUP BY p.id
                           ORDER BY p.pokedex_number;
             """;
@@ -43,10 +44,16 @@ public class PokemonRepositoryImpl implements PokemonRepository {
                               array_agg(t.pokemon_type ORDER BY pt.slot) as types
                           FROM pokemon p
                           LEFT JOIN pokemon_types pt ON p.id = pt.pokemon_id
+                          LEFT JOIN pokemon evo ON p.evolves_from_id = evo.id
                           LEFT JOIN types t ON pt.type_id = t.id
                           WHERE t.pokemon_type = ?
                           GROUP BY p.id
                           ORDER BY p.pokedex_number;
+            """;
+    private static final String CREATE_POKEMON_SQL = """
+            INSERT INTO pokemon (
+            
+            
             """;
     private final JdbcTemplate jdbc;
     private final PokemonRowMapper mapper;
@@ -68,14 +75,23 @@ public class PokemonRepositoryImpl implements PokemonRepository {
     }
 
     @Override
-    public List<Pokemon> findByType(PokemonType type) {
+    public List<Pokemon> findByType(PokemonType.Type type) {
         String pokemonType = type.toString();
         return jdbc.query(
                 FIND_ALL_SQL, mapper, pokemonType);
     }
 
     @Override
-    public void save(Pokemon pokemon) {
+    public Pokemon createPokemon(PokemonDto pokemon) {
+        Long generatedId = jdbc.queryForObject(
+                CREATE_POKEMON_SQL,
+                Long.class,
+                pokemon.getPokedexNumber(),
+                pokemon.getHp(),
+                pokemon.getDef(),   // must exist in abilities table
+                pokemon.getAtk()    // optional, can be null
+        );
         // insert logic
+        return new Pokemon();
     }
 }
