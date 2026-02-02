@@ -2,7 +2,9 @@ package com.example.pokedex.mapper;
 
 import com.example.pokedex.model.Pokemon;
 import com.example.pokedex.model.PokemonType;
+import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.stereotype.Component;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+@Component
 public class PokemonRowMapper implements RowMapper<Pokemon> {
 
     @Override

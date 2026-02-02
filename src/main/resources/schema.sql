@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS pokemon (
     def INTEGER,
     spatk INTEGER,
     spdef INTEGER,
-    evolves_from_id INT REFERENCES pokemon_species(species_id),
+    evolves_from_id INT REFERENCES pokemon(id),
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
