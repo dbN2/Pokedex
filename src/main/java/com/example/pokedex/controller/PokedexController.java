@@ -1,6 +1,7 @@
 package com.example.pokedex.controller;
 
-import com.example.pokedex.exception.UnknownErrorException;
+import com.example.pokedex.exception.RowAlreadyExistsException;
+import com.example.pokedex.exception.RowNotFoundException;
 import com.example.pokedex.model.Pokemon;
 import com.example.pokedex.model.PokemonType;
 import com.example.pokedex.model.dto.CreatePokemonRequest;
@@ -38,7 +39,9 @@ public class PokedexController {
                 return createNotFoundResponse();
             }
             return createOkResponse(pokemonResponse, 200);
-        } catch (UnknownErrorException e) {
+        } catch (RowNotFoundException e) {
+            return createNotFoundResponse();
+        } catch (Exception e) {
             return createUnknownErrorResponse();
         }
     }
@@ -51,7 +54,9 @@ public class PokedexController {
                 return createNotFoundResponse();
             }
             return createOkResponse(pokemonResponse, 200);
-        } catch (UnknownErrorException e) {
+        } catch (RowNotFoundException e) {
+            return createNotFoundResponse();
+        } catch (Exception e) {
             return createUnknownErrorResponse();
         }
     }
@@ -68,7 +73,9 @@ public class PokedexController {
                 return createNotFoundResponse();
             }
             return createOkResponse(pokemonResponse, 200);
-        } catch (UnknownErrorException e) {
+        } catch (RowNotFoundException e) {
+            return createNotFoundResponse();
+        } catch (Exception e) {
             return createUnknownErrorResponse();
         }
     }
@@ -78,7 +85,9 @@ public class PokedexController {
         try {
             List<PokemonType> types = service.findAllTypes();
             return createOkResponse(200, types);
-        } catch (UnknownErrorException e) {
+        } catch (RowNotFoundException e) {
+            return createNotFoundResponse();
+        } catch (Exception e) {
             return createUnknownErrorResponse();
         }
     }
@@ -91,7 +100,9 @@ public class PokedexController {
         try {
             Pokemon created = service.createPokemon(request);
             return createOkResponse(mapToDto(Optional.of(created)), 201);
-        } catch (UnknownErrorException e) {
+        } catch (RowAlreadyExistsException e) {
+            return createAlreadyExistsResponse();
+        } catch (Exception e) {
             return createUnknownErrorResponse();
         }
     }
@@ -147,8 +158,13 @@ public class PokedexController {
     }
 
     private ResponseEntity<Response> createNotFoundResponse() {
-        Response response = new Response("", List.of(), List.of());
+        Response response = new Response("Object not found", List.of(), List.of());
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(404));
+    }
+
+    private ResponseEntity<Response> createAlreadyExistsResponse() {
+        Response response = new Response("Object to create already exists", List.of(), List.of());
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(409));
     }
 
     private ResponseEntity<Response> createUnknownErrorResponse() {

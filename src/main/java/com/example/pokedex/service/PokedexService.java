@@ -1,18 +1,18 @@
 package com.example.pokedex.service;
 
-import com.example.pokedex.exception.UnknownErrorException;
+import com.example.pokedex.exception.RowAlreadyExistsException;
+import com.example.pokedex.exception.RowNotFoundException;
 import com.example.pokedex.model.Pokemon;
 import com.example.pokedex.model.PokemonType;
 import com.example.pokedex.model.PokemonTypeAssignment;
 import com.example.pokedex.model.dto.CreatePokemonRequest;
-import com.example.pokedex.model.dto.PokemonDto;
 import com.example.pokedex.repository.PokemonRepository;
 import com.example.pokedex.repository.PokemonTypeAssignmentsRepository;
 import com.example.pokedex.repository.PokemonTypeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.dao.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,13 +35,8 @@ public class PokedexService {
         try {
             return Optional.ofNullable(pokemonRepository.findById(id));
         }
-        catch (DataAccessException e) {
-            log.error("Encountered database error", e);
-            throw new UnknownErrorException();
-        }
-        catch (RuntimeException e) {
-            log.error("Encountered unexpected error when getting pokemon by id", e);
-            throw new UnknownErrorException();
+        catch (EmptyResultDataAccessException e) {
+            throw new RowNotFoundException();
         }
     }
 
@@ -49,13 +44,8 @@ public class PokedexService {
         try {
             return pokemonRepository.findAll();
         }
-        catch (DataAccessException e) {
-            log.error("Encountered database error when getting all pokemon ", e);
-            throw new UnknownErrorException();
-        }
-        catch (RuntimeException e) {
-            log.error("Encountered unexpected error when getting all pokemon ", e);
-            throw new UnknownErrorException();
+        catch (EmptyResultDataAccessException e) {
+            throw new RowNotFoundException();
         }
     }
 
@@ -63,13 +53,8 @@ public class PokedexService {
         try {
             return pokemonRepository.findByType(type);
         }
-        catch (DataAccessException e) {
-            log.error("Encountered database error when getting pokemon by type", e);
-            throw new UnknownErrorException();
-        }
-        catch (RuntimeException e) {
-            log.error("Encountered unexpected error when getting pokemon by type", e);
-            throw new UnknownErrorException();
+        catch (EmptyResultDataAccessException e) {
+            throw new RowNotFoundException();
         }
     }
 
@@ -77,13 +62,8 @@ public class PokedexService {
         try {
             return pokemonTypeRepository.findAll();
         }
-        catch (DataAccessException e) {
-            log.error("Encountered database error when getting types", e);
-            throw new UnknownErrorException();
-        }
-        catch (RuntimeException e) {
-            log.error("Encountered unexpected error when getting types", e);
-            throw new UnknownErrorException();
+        catch (EmptyResultDataAccessException e) {
+            throw new RowNotFoundException();
         }
     }
 
@@ -106,16 +86,10 @@ public class PokedexService {
             });
 
             return pokemonRepository.findById(createdId);
+        } catch (EmptyResultDataAccessException e) {
+            throw new RowNotFoundException();
         } catch (DataIntegrityViolationException e) {
-            log.error("Pokemon to create already exists", e);
-            //TODO fix exception handling
-            throw new UnknownErrorException();
-        } catch (DataAccessException e) {
-            log.error("Encountered database error when creating pokemon", e);
-            throw new UnknownErrorException();
-        } catch (RuntimeException e) {
-            log.error("Encountered unexpected error when creating pokemon", e);
-            throw new UnknownErrorException();
+            throw new RowAlreadyExistsException();
         }
     }
 }

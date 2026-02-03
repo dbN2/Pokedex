@@ -1,4 +1,4 @@
 package com.example.pokedex.exception;
 
-public class UnknownErrorException extends RuntimeException {
+public class RowAlreadyExistsException extends RuntimeException {
 }
