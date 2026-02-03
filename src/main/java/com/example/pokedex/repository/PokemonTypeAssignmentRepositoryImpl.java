@@ -8,7 +8,10 @@ import org.springframework.stereotype.Component;
 public class PokemonTypeAssignmentRepositoryImpl implements PokemonTypeAssignmentsRepository {
 
     private final JdbcTemplate jdbc;
-    private static final String CREATE_SQL = "INSERT INTO pokemon_types (pokemon_id, type_id) VALUES (?, ?)";
+    private static final String CREATE_SQL = """
+    INSERT INTO pokemon_types (pokemon_id, type_id)
+    VALUES (?, ?)
+    """;
 
     public PokemonTypeAssignmentRepositoryImpl(JdbcTemplate jdbc) {
         this.jdbc = jdbc;
@@ -16,6 +19,6 @@ public class PokemonTypeAssignmentRepositoryImpl implements PokemonTypeAssignmen
 
     @Override
     public void createPokemonTypeAssignment(PokemonTypeAssignment assignment) {
-        jdbc.update(CREATE_SQL);
+        jdbc.update(CREATE_SQL, assignment.getPokemonId(), assignment.getTypeId());
     }
 }

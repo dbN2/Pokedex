@@ -8,7 +8,7 @@ import java.util.List;
 
 public class CreatePokemonRequest {
     private final Integer pokedexNumber;
-    private final String name;
+    private String name;
     private final Integer hp;
     private final Integer atk;
     private final Integer def;
@@ -75,6 +75,10 @@ public class CreatePokemonRequest {
 
     public String getEvolvesFrom() {
         return evolvesFrom;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public void setEvolvesFromId(Long evolvesFromId) {

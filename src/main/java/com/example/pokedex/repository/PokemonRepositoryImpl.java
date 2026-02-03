@@ -21,7 +21,7 @@ public class PokemonRepositoryImpl implements PokemonRepository {
                     LEFT JOIN types t ON t.id = pt.type_id
                     LEFT JOIN pokemon evo ON p.evolves_from_id = evo.id
                     WHERE p.id = ?
-                    GROUP BY p.id;
+                    GROUP BY p.id, evo.name;
             """;
     private static final String FIND_BY_NAME_SQL =
             """
@@ -33,7 +33,7 @@ public class PokemonRepositoryImpl implements PokemonRepository {
                     LEFT JOIN types t ON t.id = pt.type_id
                     LEFT JOIN pokemon evo ON p.evolves_from_id = evo.id
                     WHERE p.name = ?
-                    GROUP BY p.name;
+                    GROUP BY p.id, evo.name;
             """;
     private static final String FIND_ALL_SQL =
             """
@@ -61,7 +61,7 @@ public class PokemonRepositoryImpl implements PokemonRepository {
                           ORDER BY p.pokedex_number;
             """;
     private static final String CREATE_POKEMON_SQL = """
-            INSERT INTO pokemon (pokedex_number, name, hp, atk, def, spd, spatk, spdef, evo_id)
+            INSERT INTO pokemon (pokedex_number, name, hp, atk, def, spd, spatk, spdef, evolves_from_id)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING id
             """;
@@ -107,6 +107,7 @@ public class PokemonRepositoryImpl implements PokemonRepository {
                 CREATE_POKEMON_SQL,
                 Long.class,
                 request.getPokedexNumber(),
+                request.getName(),
                 request.getHp(),
                 request.getAtk(),
                 request.getDef(),

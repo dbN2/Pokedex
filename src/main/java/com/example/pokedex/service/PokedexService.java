@@ -90,12 +90,13 @@ public class PokedexService {
     public Pokemon createPokemon(CreatePokemonRequest request) {
         try {
             // Saturate id after querying name if present
-            if (!request.getEvolvesFrom().isEmpty()) {
+            if (request.getEvolvesFrom() != null && !request.getEvolvesFrom().isEmpty()) {
                 Pokemon queried = pokemonRepository.findByName(request.getEvolvesFrom());
                 if (queried != null && queried.getId() != null) {
                     request.setEvolvesFromId(queried.getId());
                 }
             }
+            request.setName((request.getName().toUpperCase()));
             Long createdId = pokemonRepository.createPokemon(request);
             // Create pokemon type assignments
             request.getTypes().forEach((type) -> {
@@ -106,7 +107,7 @@ public class PokedexService {
 
             return pokemonRepository.findById(createdId);
         } catch (DataIntegrityViolationException e) {
-            log.error("Pokemon to create already exists");
+            log.error("Pokemon to create already exists", e);
             //TODO fix exception handling
             throw new UnknownErrorException();
         } catch (DataAccessException e) {

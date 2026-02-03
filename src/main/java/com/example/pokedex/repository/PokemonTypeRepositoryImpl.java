@@ -14,7 +14,7 @@ public class PokemonTypeRepositoryImpl implements PokemonTypeRepository {
     private final JdbcTemplate jdbc;
     private final PokemonTypeMapper mapper;
 
-    private static final String FIND_BY_NAME_SQL = "SELECT * FROM types where name = ?";
+    private static final String FIND_BY_NAME_SQL = "SELECT * FROM types where pokemon_type = ?";
     private static final String FIND_ALL_SQL = "SELECT * FROM types";
 
     public PokemonTypeRepositoryImpl(JdbcTemplate jdbc, PokemonTypeMapper mapper) {

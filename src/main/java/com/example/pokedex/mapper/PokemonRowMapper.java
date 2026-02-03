@@ -50,6 +50,7 @@ public class PokemonRowMapper implements RowMapper<Pokemon> {
         List<PokemonType> typesList = new ArrayList<>();
         stringList.forEach((k) -> {
                 PokemonType pokemonType = new PokemonType();
+                pokemonType.setId(pokemonType.getId());
                 pokemonType.setType(PokemonType.getEnumFromString(k));
                 typesList.add(pokemonType);
         });

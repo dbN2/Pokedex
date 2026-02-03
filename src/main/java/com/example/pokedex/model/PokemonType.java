@@ -27,6 +27,7 @@ public class PokemonType {
         GROUND,
         FLYING,
         PSYCHIC,
+        POISON,
         UNKNOWN;
     }
 
@@ -57,7 +58,7 @@ public class PokemonType {
         try {
             return Type.valueOf(type);
         } catch (Exception e) {
-            log.error("Invalid type encountered when parsing PokemonType");
+            log.error("Invalid type encountered when parsing PokemonType {}", type, e);
             return Type.UNKNOWN;
         }
     }
