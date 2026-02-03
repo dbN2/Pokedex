@@ -4,11 +4,9 @@ import com.example.pokedex.mapper.PokemonRowMapper;
 import com.example.pokedex.model.Pokemon;
 import com.example.pokedex.model.PokemonType;
 import com.example.pokedex.model.dto.PokemonDto;
-import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
-import java.sql.SQLException;
 import java.util.List;
 
 @Component
@@ -29,19 +27,19 @@ public class PokemonRepositoryImpl implements PokemonRepository {
             """
                   SELECT
                               p.*,
-                              array_agg(t.pokemon_type ORDER BY pt.slot) as types,
+                              array_agg(t.pokemon_type) as types,
                               evo.name as evolves_from
                           FROM pokemon p
                           LEFT JOIN pokemon_types pt ON p.id = pt.pokemon_id
                           LEFT JOIN pokemon evo ON p.evolves_from_id = evo.id
                           LEFT JOIN types t ON pt.type_id = t.id
-                          GROUP BY p.id
+                          GROUP BY p.id, evo.name
                           ORDER BY p.pokedex_number;
             """;
     private static final String FIND_BY_TYPE_SQL = """
             SELECT
                               p.*,
-                              array_agg(t.pokemon_type ORDER BY pt.slot) as types
+                              array_agg(t.pokemon_type) as types
                           FROM pokemon p
                           LEFT JOIN pokemon_types pt ON p.id = pt.pokemon_id
                           LEFT JOIN pokemon evo ON p.evolves_from_id = evo.id
@@ -51,10 +49,14 @@ public class PokemonRepositoryImpl implements PokemonRepository {
                           ORDER BY p.pokedex_number;
             """;
     private static final String CREATE_POKEMON_SQL = """
-            INSERT INTO pokemon (
-            
-            
+            INSERT INTO pokemon (pokedex_number, name, hp, atk, def, spd, spatk, spdef, evo_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """;
+    private static final String CREATE_POKEMON_TYPE_MAPPING_SQL = """
+            INSERT INTO pokemon_types (pokemon_id, type_id)
+            VALUES (?, ?)
+            """;
+
     private final JdbcTemplate jdbc;
     private final PokemonRowMapper mapper;
 

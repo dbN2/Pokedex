@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS pokemon (
 
 CREATE TABLE IF NOT EXISTS types (
                                         id SERIAL PRIMARY KEY,
-                                        pokemon_type VARCHAR(20) NOT NULL,
+                                        pokemon_type VARCHAR(20) UNIQUE NOT NULL,
     created TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );

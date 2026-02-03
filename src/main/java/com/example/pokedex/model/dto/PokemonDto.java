@@ -8,6 +8,7 @@ import java.util.List;
 public class PokemonDto {
     private final Long id;
     private final Integer pokedexNumber;
+    private final String name;
     private final Integer hp;
     private final Integer atk;
     private final Integer def;
@@ -20,6 +21,7 @@ public class PokemonDto {
     private PokemonDto(Builder builder) {
         this.id = builder.id;
         this.pokedexNumber = builder.pokedexNumber;
+        this.name = builder.name;
         this.hp = builder.hp;
         this.atk = builder.atk;
         this.def = builder.def;
@@ -35,25 +37,27 @@ public class PokemonDto {
     }
 
     public static class Builder {
-        private long id;
-        private int pokedexNumber;
-        private int hp;
-        private int atk;
-        private int def;
-        private int spd;
-        private int spatk;
-        private int spdef;
+        private Long id;
+        private Integer pokedexNumber;
+        private String name;
+        private Integer hp;
+        private Integer atk;
+        private Integer def;
+        private Integer spd;
+        private Integer spatk;
+        private Integer spdef;
         private List<PokemonType> types = new ArrayList<>();
         private String evolvesFrom;
 
-        public Builder id(long id) { this.id = id; return this; }
-        public Builder pokedexNumber(int pokedexNumber) { this.pokedexNumber = pokedexNumber; return this; }
-        public Builder hp(int hp) { this.hp = hp; return this; }
-        public Builder atk(int atk) { this.atk = atk; return this; }
-        public Builder def(int def) { this.def = def; return this; }
-        public Builder spd(int spd) { this.spd = spd; return this; }
-        public Builder spatk(int spatk) { this.spatk = spatk; return this; }
-        public Builder spdef(int spdef) { this.spdef = spdef; return this; }
+        public Builder id(Long id) { this.id = id; return this; }
+        public Builder pokedexNumber(Integer pokedexNumber) { this.pokedexNumber = pokedexNumber; return this; }
+        public Builder name(String name) { this.name = name; return this; }
+        public Builder hp(Integer hp) { this.hp = hp; return this; }
+        public Builder atk(Integer atk) { this.atk = atk; return this; }
+        public Builder def(Integer def) { this.def = def; return this; }
+        public Builder spd(Integer spd) { this.spd = spd; return this; }
+        public Builder spatk(Integer spatk) { this.spatk = spatk; return this; }
+        public Builder spdef(Integer spdef) { this.spdef = spdef; return this; }
         public Builder types(List<PokemonType> types) { this.types = types; return this; }
         public Builder evolvesFrom(String evolvesFrom) { this.evolvesFrom = evolvesFrom; return this; }
 
@@ -62,8 +66,16 @@ public class PokemonDto {
         }
     }
 
+    public Long getId() {
+        return id;
+    }
+
     public Integer getPokedexNumber() {
         return pokedexNumber;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Integer getHp() {

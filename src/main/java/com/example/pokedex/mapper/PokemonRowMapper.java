@@ -2,7 +2,6 @@ package com.example.pokedex.mapper;
 
 import com.example.pokedex.model.Pokemon;
 import com.example.pokedex.model.PokemonType;
-import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +21,7 @@ public class PokemonRowMapper implements RowMapper<Pokemon> {
         // non null
         pokemon.setId(rs.getLong("id"));
         pokemon.setPokedexNumber(rs.getInt("pokedex_number"));
-        pokemon.setName(rs.getString("pokemon_name"));
+        pokemon.setName(rs.getString("name"));
 
         // Handle nullable stats
         pokemon.setHp(getNullableInt(rs, "hp"));
@@ -39,7 +38,7 @@ public class PokemonRowMapper implements RowMapper<Pokemon> {
 
     private Integer getNullableInt(ResultSet rs, String column) throws SQLException {
         int value = rs.getInt(column);
-        return rs.wasNull() ? value : null;
+        return rs.wasNull() ? null : value;
     }
 
     private List<PokemonType> getTypesForPokemon(ResultSet rs, String column) throws SQLException {

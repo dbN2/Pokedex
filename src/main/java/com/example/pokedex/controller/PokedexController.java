@@ -3,9 +3,12 @@ package com.example.pokedex.controller;
 import com.example.pokedex.exception.UnknownErrorException;
 import com.example.pokedex.model.Pokemon;
 import com.example.pokedex.model.PokemonType;
+import com.example.pokedex.model.dto.CreatePokemonRequest;
 import com.example.pokedex.model.dto.PokemonDto;
 import com.example.pokedex.model.dto.Response;
 import com.example.pokedex.service.PokedexService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +21,7 @@ import java.util.Optional;
 @RequestMapping("/pokedex")
 public class PokedexController {
     private final PokedexService service;
+    private static final Logger log = LoggerFactory.getLogger(PokedexController.class);
 
     public PokedexController(PokedexService service) {
         this.service = service;
@@ -59,7 +63,7 @@ public class PokedexController {
 
     @GetMapping("/pokemon/type/{type}")
     public ResponseEntity<Response> getPokemonByType(String type) {
-        if (!PokemonType.containsType(type)) {
+        if (type == null || !PokemonType.containsType(type)) {
             return createBadRequestResponse();
         }
         try {
@@ -74,8 +78,18 @@ public class PokedexController {
         }
     }
 
+    @GetMapping("/types")
+    public ResponseEntity<Response> getAllTypes() {
+        try {
+            List<PokemonType> types = service.findAllTypes();
+            return createOkResponse(200, types);
+        } catch (UnknownErrorException e) {
+            return createUnknownErrorResponse();
+        }
+    }
+
     @PostMapping("/pokemon")
-    public ResponseEntity<Response> createPokemon(@RequestBody PokemonDto request) {
+    public ResponseEntity<Response> createPokemon(@RequestBody CreatePokemonRequest request) {
         List<PokemonDto> pokemonResponse = mapToDto(service.findPokemonById(1L));
         return createOkResponse(pokemonResponse, 201);
     }
@@ -87,6 +101,7 @@ public class PokedexController {
         var response = new PokemonDto.Builder()
                 .id(pokemon.getId())
                 .pokedexNumber(pokemon.getPokedexNumber())
+                .name(pokemon.getName())
                 .hp(pokemon.getHp())
                 .def(pokemon.getDef())
                 .atk(pokemon.getAtk())
@@ -108,6 +123,7 @@ public class PokedexController {
             PokemonDto dto = new PokemonDto.Builder()
                     .id(pokemon.getId())
                     .pokedexNumber(pokemon.getPokedexNumber())
+                    .name(pokemon.getName())
                     .hp(pokemon.getHp())
                     .def(pokemon.getDef())
                     .atk(pokemon.getAtk())
@@ -124,22 +140,27 @@ public class PokedexController {
     }
 
     private ResponseEntity<Response> createBadRequestResponse() {
-        Response response = new Response("Request contains invalid or missing values", List.of());
+        Response response = new Response("Request contains invalid or missing values", List.of(), List.of());
         return ResponseEntity.badRequest().body(response);
     }
 
     private ResponseEntity<Response> createNotFoundResponse() {
-        Response response = new Response("", List.of());
+        Response response = new Response("", List.of(), List.of());
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(404));
     }
 
     private ResponseEntity<Response> createUnknownErrorResponse() {
-        Response response = new Response("Encountered unknown error", List.of());
+        Response response = new Response("Encountered unknown error", List.of(), List.of());
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(500));
     }
 
     private ResponseEntity<Response> createOkResponse(List<PokemonDto> pokemon, Integer httpCode) {
-        Response response = new Response("", pokemon);
-        return new ResponseEntity<>(response, HttpStatusCode.valueOf(200));
+        Response response = new Response("", pokemon, List.of());
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(httpCode));
+    }
+
+    private ResponseEntity<Response> createOkResponse(Integer httpCode, List<PokemonType> pokemonTypes) {
+        Response response = new Response("", List.of(), pokemonTypes);
+        return new ResponseEntity<>(response, HttpStatusCode.valueOf(httpCode));
     }
 }

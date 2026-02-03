@@ -1,5 +1,6 @@
 package com.example.pokedex.repository;
 
+import com.example.pokedex.mapper.PokemonTypeMapper;
 import com.example.pokedex.model.Pokemon;
 import com.example.pokedex.model.PokemonType;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -10,29 +11,17 @@ import java.util.List;
 public class PokemonTypeRepositoryImpl implements PokemonTypeRepository {
 
     private final JdbcTemplate jdbc;
-    private static final String FIND_BY_ID_SQL = """
-            SELECT * FROM types WHERE id = ?
-            """;
+    private final PokemonTypeMapper mapper;
 
-    public PokemonTypeRepositoryImpl(JdbcTemplate jdbc) {
+    private static final String FIND_ALL_SQL = "SELECT * FROM types";
+
+    public PokemonTypeRepositoryImpl(JdbcTemplate jdbc, PokemonTypeMapper mapper) {
         this.jdbc = jdbc;
-    }
-
-    @Override
-    public PokemonType findById(Long id) {
-        return jdbc.queryForObject(FIND_BY_ID_SQL,
-                (rs, rowNum) -> new PokemonType(
-                        rs.getString("pokemon_type")
-                ), id);
+        this.mapper = mapper;
     }
 
     @Override
     public List<PokemonType> findAll() {
-        return List.of();
-    }
-
-    @Override
-    public void save(PokemonType skill) {
-
+        return jdbc.query(FIND_ALL_SQL, mapper);
     }
 }
