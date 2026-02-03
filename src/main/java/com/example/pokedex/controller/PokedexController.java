@@ -27,11 +27,6 @@ public class PokedexController {
         this.service = service;
     }
 
-    @GetMapping
-    public String home() {
-        return "Hello, Docker!";
-    }
-
     @GetMapping("/pokemon/{id}")
     public ResponseEntity<Response> getPokemon(@PathVariable Long id) {
         if (id == null) {
@@ -62,7 +57,7 @@ public class PokedexController {
     }
 
     @GetMapping("/pokemon/type/{type}")
-    public ResponseEntity<Response> getPokemonByType(String type) {
+    public ResponseEntity<Response> getPokemonByType(@PathVariable String type) {
         if (type == null || !PokemonType.containsType(type)) {
             return createBadRequestResponse();
         }
@@ -90,8 +85,15 @@ public class PokedexController {
 
     @PostMapping("/pokemon")
     public ResponseEntity<Response> createPokemon(@RequestBody CreatePokemonRequest request) {
-        List<PokemonDto> pokemonResponse = mapToDto(service.findPokemonById(1L));
-        return createOkResponse(pokemonResponse, 201);
+        if (isInvalidCreateRequest(request)) {
+            return createBadRequestResponse();
+        }
+        try {
+            Optional<Pokemon> created = service.createPokemon(request);
+            return createOkResponse(mapToDto(created), 201);
+        } catch (UnknownErrorException e) {
+            return createUnknownErrorResponse();
+        }
     }
 
     private List<PokemonDto> mapToDto(Optional<Pokemon> pokemonOptional) {
@@ -150,7 +152,7 @@ public class PokedexController {
     }
 
     private ResponseEntity<Response> createUnknownErrorResponse() {
-        Response response = new Response("Encountered unknown error", List.of(), List.of());
+        Response response = new Response("Encountered internal error", List.of(), List.of());
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(500));
     }
 
@@ -162,5 +164,12 @@ public class PokedexController {
     private ResponseEntity<Response> createOkResponse(Integer httpCode, List<PokemonType> pokemonTypes) {
         Response response = new Response("", List.of(), pokemonTypes);
         return new ResponseEntity<>(response, HttpStatusCode.valueOf(httpCode));
+    }
+
+    private boolean isInvalidCreateRequest(CreatePokemonRequest request) {
+        // Request requires pokedex number, name, types, and it can't have both evolution id and name
+        return request.getPokedexNumber() == null || request.getName().isBlank()
+                || request.getTypes() == null || request.getTypes().isEmpty()
+                || (request.getEvolvesFromId() != null && !request.getEvolvesFrom().isBlank());
     }
 }

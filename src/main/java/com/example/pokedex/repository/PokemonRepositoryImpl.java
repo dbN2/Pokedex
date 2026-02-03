@@ -3,7 +3,7 @@ package com.example.pokedex.repository;
 import com.example.pokedex.mapper.PokemonRowMapper;
 import com.example.pokedex.model.Pokemon;
 import com.example.pokedex.model.PokemonType;
-import com.example.pokedex.model.dto.PokemonDto;
+import com.example.pokedex.model.dto.CreatePokemonRequest;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +11,7 @@ import java.util.List;
 
 @Component
 public class PokemonRepositoryImpl implements PokemonRepository {
-    private static final String FIND_ONE_SQL =
+    private static final String FIND_BY_ID_SQL =
             """
             SELECT      p.*,
                         array_agg(t.pokemon_type) as types,
@@ -21,6 +21,18 @@ public class PokemonRepositoryImpl implements PokemonRepository {
                     LEFT JOIN types t ON t.id = pt.type_id
                     LEFT JOIN pokemon evo ON p.evolves_from_id = evo.id
                     WHERE p.id = ?
+                    GROUP BY p.id;
+            """;
+    private static final String FIND_BY_NAME_SQL =
+            """
+            SELECT      p.*,
+                        array_agg(t.pokemon_type) as types,
+                        evo.name as evolves_from
+                    FROM pokemon p
+                    LEFT JOIN pokemon_types pt ON p.id = pt.pokemon_id
+                    LEFT JOIN types t ON t.id = pt.type_id
+                    LEFT JOIN pokemon evo ON p.evolves_from_id = evo.id
+                    WHERE p.name = ?
                     GROUP BY p.id;
             """;
     private static final String FIND_ALL_SQL =
@@ -67,7 +79,12 @@ public class PokemonRepositoryImpl implements PokemonRepository {
 
     @Override
     public Pokemon findById(Long id) {
-        return jdbc.queryForObject(FIND_ONE_SQL, mapper, id);
+        return jdbc.queryForObject(FIND_BY_ID_SQL, mapper, id);
+    }
+
+    @Override
+    public Pokemon findByName(String name) {
+        return jdbc.queryForObject(FIND_BY_NAME_SQL, mapper, name);
     }
 
     @Override
@@ -84,7 +101,7 @@ public class PokemonRepositoryImpl implements PokemonRepository {
     }
 
     @Override
-    public Pokemon createPokemon(PokemonDto pokemon) {
+    public Pokemon createPokemon(CreatePokemonRequest pokemon) {
         Long generatedId = jdbc.queryForObject(
                 CREATE_POKEMON_SQL,
                 Long.class,
