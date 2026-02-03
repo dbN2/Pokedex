@@ -89,8 +89,8 @@ public class PokedexController {
             return createBadRequestResponse();
         }
         try {
-            Optional<Pokemon> created = service.createPokemon(request);
-            return createOkResponse(mapToDto(created), 201);
+            Pokemon created = service.createPokemon(request);
+            return createOkResponse(mapToDto(Optional.of(created)), 201);
         } catch (UnknownErrorException e) {
             return createUnknownErrorResponse();
         }

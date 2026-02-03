@@ -1,0 +1,205 @@
+openapi: 3.0.1
+info:
+  title: OpenAPI definition
+  version: v0
+servers:
+- url: http://localhost:8080
+  description: Generated server url
+paths:
+  /pokedex/pokemon:
+    get:
+      tags:
+      - pokedex-controller
+      operationId: getAllPokemon
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Response"
+    post:
+      tags:
+      - pokedex-controller
+      operationId: createPokemon
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePokemonRequest"
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Response"
+  /pokedex/types:
+    get:
+      tags:
+      - pokedex-controller
+      operationId: getAllTypes
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Response"
+  /pokedex/pokemon/{id}:
+    get:
+      tags:
+      - pokedex-controller
+      operationId: getPokemon
+      parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: integer
+          format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Response"
+  /pokedex/pokemon/type/{type}:
+    get:
+      tags:
+      - pokedex-controller
+      operationId: getPokemonByType
+      parameters:
+      - name: type
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Response"
+components:
+  schemas:
+    CreatePokemonRequest:
+      type: object
+      properties:
+        pokedexNumber:
+          type: integer
+          format: int32
+        name:
+          type: string
+        hp:
+          type: integer
+          format: int32
+        atk:
+          type: integer
+          format: int32
+        def:
+          type: integer
+          format: int32
+        spd:
+          type: integer
+          format: int32
+        spatk:
+          type: integer
+          format: int32
+        spdef:
+          type: integer
+          format: int32
+        types:
+          type: array
+          items:
+            type: string
+            enum:
+            - FIRE
+            - WATER
+            - ICE
+            - MAGMA
+            - ELECTRIC
+            - FIGHTING
+            - GRASS
+            - DARK
+            - GROUND
+            - FLYING
+            - PSYCHIC
+            - UNKNOWN
+        evolvesFromId:
+          type: integer
+          format: int64
+        evolvesFrom:
+          type: string
+    PokemonDto:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        pokedexNumber:
+          type: integer
+          format: int32
+        name:
+          type: string
+        hp:
+          type: integer
+          format: int32
+        atk:
+          type: integer
+          format: int32
+        def:
+          type: integer
+          format: int32
+        spd:
+          type: integer
+          format: int32
+        spatk:
+          type: integer
+          format: int32
+        spdef:
+          type: integer
+          format: int32
+        types:
+          type: array
+          items:
+            $ref: "#/components/schemas/PokemonType"
+        evolvesFrom:
+          type: string
+    PokemonType:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        type:
+          type: string
+          enum:
+          - FIRE
+          - WATER
+          - ICE
+          - MAGMA
+          - ELECTRIC
+          - FIGHTING
+          - GRASS
+          - DARK
+          - GROUND
+          - FLYING
+          - PSYCHIC
+          - UNKNOWN
+    Response:
+      type: object
+      properties:
+        body:
+          type: string
+        pokemon:
+          type: array
+          items:
+            $ref: "#/components/schemas/PokemonDto"
+        types:
+          type: array
+          items:
+            $ref: "#/components/schemas/PokemonType"

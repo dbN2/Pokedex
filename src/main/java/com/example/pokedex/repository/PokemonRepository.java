@@ -13,6 +13,6 @@ public interface PokemonRepository {
     Pokemon findByName(String name) throws DataAccessException;
     List<Pokemon> findAll() throws DataAccessException;
     List<Pokemon> findByType(PokemonType.Type type) throws DataAccessException;
-    Pokemon createPokemon(CreatePokemonRequest pokemon) throws DataAccessException;
+    Long createPokemon(CreatePokemonRequest pokemon) throws DataAccessException;
 }
 

@@ -3,6 +3,7 @@ package com.example.pokedex.service;
 import com.example.pokedex.exception.UnknownErrorException;
 import com.example.pokedex.model.Pokemon;
 import com.example.pokedex.model.PokemonType;
+import com.example.pokedex.model.PokemonTypeAssignment;
 import com.example.pokedex.model.dto.CreatePokemonRequest;
 import com.example.pokedex.model.dto.PokemonDto;
 import com.example.pokedex.repository.PokemonRepository;
@@ -11,6 +12,7 @@ import com.example.pokedex.repository.PokemonTypeRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -85,21 +87,28 @@ public class PokedexService {
         }
     }
 
-    public Optional<Pokemon> createPokemon(CreatePokemonRequest request) {
+    public Pokemon createPokemon(CreatePokemonRequest request) {
         try {
             // Saturate id after querying name if present
             if (!request.getEvolvesFrom().isEmpty()) {
-            Pokemon queried = pokemonRepository.findByName(request.getName());
-            if (queried != null && queried.getId() != null) {
-                request.setEvolvesFromId(queried.getId());
+                Pokemon queried = pokemonRepository.findByName(request.getEvolvesFrom());
+                if (queried != null && queried.getId() != null) {
+                    request.setEvolvesFromId(queried.getId());
+                }
             }
-            }
-            Optional<Pokemon> created = Optional.ofNullable(pokemonRepository.createPokemon(request));
-            if (created.isEmpty()) {
-                log.error("Failed to create Pokemon with request {}", request);
-                throw new UnknownErrorException();
-            }
-            return created;
+            Long createdId = pokemonRepository.createPokemon(request);
+            // Create pokemon type assignments
+            request.getTypes().forEach((type) -> {
+                Long typeId = pokemonTypeRepository.findByName(type.toString()).getId();
+                PokemonTypeAssignment assignment = new PokemonTypeAssignment(createdId, typeId);
+                pokemonTypeAssignmentsRepository.createPokemonTypeAssignment(assignment);
+            });
+
+            return pokemonRepository.findById(createdId);
+        } catch (DataIntegrityViolationException e) {
+            log.error("Pokemon to create already exists");
+            //TODO fix exception handling
+            throw new UnknownErrorException();
         } catch (DataAccessException e) {
             log.error("Encountered database error when creating pokemon", e);
             throw new UnknownErrorException();

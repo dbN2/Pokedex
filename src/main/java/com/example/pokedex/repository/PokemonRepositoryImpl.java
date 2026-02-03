@@ -33,7 +33,7 @@ public class PokemonRepositoryImpl implements PokemonRepository {
                     LEFT JOIN types t ON t.id = pt.type_id
                     LEFT JOIN pokemon evo ON p.evolves_from_id = evo.id
                     WHERE p.name = ?
-                    GROUP BY p.id;
+                    GROUP BY p.name;
             """;
     private static final String FIND_ALL_SQL =
             """
@@ -63,6 +63,7 @@ public class PokemonRepositoryImpl implements PokemonRepository {
     private static final String CREATE_POKEMON_SQL = """
             INSERT INTO pokemon (pokedex_number, name, hp, atk, def, spd, spatk, spdef, evo_id)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            RETURNING id
             """;
     private static final String CREATE_POKEMON_TYPE_MAPPING_SQL = """
             INSERT INTO pokemon_types (pokemon_id, type_id)
@@ -101,16 +102,18 @@ public class PokemonRepositoryImpl implements PokemonRepository {
     }
 
     @Override
-    public Pokemon createPokemon(CreatePokemonRequest pokemon) {
-        Long generatedId = jdbc.queryForObject(
+    public Long createPokemon(CreatePokemonRequest request) {
+        return jdbc.queryForObject(
                 CREATE_POKEMON_SQL,
                 Long.class,
-                pokemon.getPokedexNumber(),
-                pokemon.getHp(),
-                pokemon.getDef(),   // must exist in abilities table
-                pokemon.getAtk()    // optional, can be null
-        );
-        // insert logic
-        return new Pokemon();
+                request.getPokedexNumber(),
+                request.getHp(),
+                request.getAtk(),
+                request.getDef(),
+                request.getSpd(),
+                request.getSpatk(),
+                request.getSpdef(),
+                request.getEvolvesFromId()
+                );
     }
 }
