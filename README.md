@@ -99,6 +99,7 @@ Creates a new Pokemon.
 {
   "id": 0,
   "pokedexNumber": 0,
+  "name": "CHARIZARD",
   "hp": 0,
   "atk": 0,
   "def": 0,
@@ -107,10 +108,10 @@ Creates a new Pokemon.
   "spdef": 0,
   "types": [
     {
-      "id": 0,
       "type": "FIRE"
     }
   ],
+  "evolvesFromId": 1,
   "evolvesFrom": "string"
 }
 ```
